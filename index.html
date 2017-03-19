@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>hi</title>
+	<script src="/node_modules/jquery/dist/jquery.js"></script>
+	<script src="/node_modules/knockout/build/output/knockout-latest.debug.js"></script>
+</head>
+<body>
+	
+	<table id="x">
+    <thead>
+        <tr>
+        	<th>userid</th>
+        	<th>id</th>
+        	<th>title</th>
+        </tr>
+    </thead>
+    <tbody data-bind="foreach: datas">
+        <tr>
+            <td>
+            	<span data-bind="text: userId"></span>
+            	<input data-bind="value: userId" style="width:25px;"/>
+            </td>
+            <td>
+            	<span data-bind="text: id"></span>
+            </td>
+            <td>
+            	<span data-bind="text: title"></span>
+            </td>
+            <td>
+            	<span data-bind="click: $parent.delete" style="cursour:pointer;">(X)</span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+ 
+<script type="text/javascript">
+
+var viewModel;
+viewModel = new newViewModel()
+
+function CreatePostModel(parent){
+	var self = this;
+	self.id = ko.observable(0);
+	self.userId = ko.observable(0);
+	self.title = ko.observable('');
+	self.body = ko.observable('');
+}
+
+function newViewModel(){
+	var self = this;
+	self.datas = ko.observableArray([]);
+	self.createPost = function (postData) {
+		var postModel = new CreatePostModel(this);
+		postModel.id(postData.id);
+		postModel.userId(postData.userId);
+		postModel.title(postData.title);
+		postModel.body(postData.body);
+
+		return postModel
+	};
+	self.delete = function(postId){
+		self.datas.remove(postId)
+	}
+}
+
+$.ajax({
+	url: 'https://jsonplaceholder.typicode.com/posts',
+	dataType: 'json',
+	success: function(data) {
+	    success(data)
+	}.bind(this),
+	error: function(xhr, status, err) {
+	  console.log(err)
+	}
+})
+
+function success(data){
+	var temp = []
+
+	$.each(data, function(i,v){
+		var doPost = viewModel.createPost(v);
+		temp.push(doPost)
+	})
+
+	viewModel.datas(temp);
+	ko.applyBindings(viewModel,document.getElementById('x'));	
+}
+
+
+
+</script>
+</body>
+</html>

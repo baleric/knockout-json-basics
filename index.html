@@ -19,16 +19,23 @@
         <tr>
             <td>
             	<span data-bind="text: userId"></span>
-            	<input data-bind="value: userId" style="width:25px;"/>
             </td>
-            <td>
+            <td>aut
             	<span data-bind="text: id"></span>
             </td>
             <td>
-            	<span data-bind="text: title"></span>
+            	<div data-bind="visible: edit() === false">
+            		<span data-bind="text: title"></span>
+            	</div>
+            	<div data-bind="visible: edit() === true">
+            		<input data-bind="value: title, valueUpdate: 'afterkeydown', enterkey: $root.editMode" style="width:100%;"/>            		
+            	</div>
             </td>
             <td>
-            	<span data-bind="click: $parent.delete" style="cursour:pointer;">(X)</span>
+            	<span data-bind="click: $root.delete" style="cursour:pointer;">(X)</span>
+            	&nbsp; &nbsp;
+            	<span data-bind="visible: edit() === false, click: $root.editMode" style="cursour:pointer;">(EDIT)</span>
+            	<span data-bind="visible: edit() === true, click: $root.editMode" style="cursour:pointer;">(SAVE)</span>
             </td>
         </tr>
     </tbody>
@@ -45,6 +52,7 @@ function CreatePostModel(parent){
 	self.userId = ko.observable(0);
 	self.title = ko.observable('');
 	self.body = ko.observable('');
+	self.edit = ko.observable(false);
 }
 
 function newViewModel(){
@@ -56,11 +64,24 @@ function newViewModel(){
 		postModel.userId(postData.userId);
 		postModel.title(postData.title);
 		postModel.body(postData.body);
+		postModel.edit(false);
 
 		return postModel
 	};
 	self.delete = function(postId){
 		self.datas.remove(postId)
+	};
+	self.editMode = function(){
+		var self = this;
+
+		console.log(self.edit())
+
+		if (self.edit() === true) {
+			self.edit(false);	
+		} else {
+			self.edit(true);	
+		}
+		console.log('edit')		
 	}
 }
 
